@@ -307,6 +307,15 @@ public class Planner extends JFrame implements ActionListener {
                 }
                 taNote.append(String.format(">>> AOR, w=%.2f, r=%.2f\n", w, r));
             } else
+            if (tfMethod.getText().toUpperCase().equals("TOR")) {
+                while(!converge) {
+                    solver.doTOR(w, r, s);
+                    label.setText(String.format("%d", ++iteration));
+                    converge = solver.checkConverge();
+                    solver.updateMatrix();
+                }
+                taNote.append(String.format(">>> TOR, w=%.2f, r=%.2f, s=%.2f\n", w, r, s));
+            } else
             if (tfMethod.getText().toUpperCase().equals("MSOR")) {
                 while(!converge) {
                     solver.doMSOR(w, ww);
