@@ -319,6 +319,29 @@ public class Solver {
     }
 
 
+    public void doHSMQOR(double w, double ww, double r, double s, double t, double u) {
+        // Compute the RED nodes
+        for(int y = 1; y < Ny-1; y++)
+        for(int x = 1; x < Nx-1; x++)
+            if((x%2 == 0) && (y%2 == 0))
+            if(W[x+y*Nx] != WALL_VALUE)
+            {
+                V[x+y*Nx] = w*0.25 * (U[x-1+(y-1)*Nx] + U[x+1+(y-1)*Nx] + U[x-1+(y+1)*Nx] + U[x+1+(y+1)*Nx]) + (1-w)*U[x+y*Nx];
+            }
+
+        // Compute the BLACK nodes
+        for(int y = 1; y < Ny-1; y++)
+        for(int x = 1; x < Nx-1; x++)
+            if((x%2 == 1) && (y%2 == 1))
+            if(W[x+y*Nx] != WALL_VALUE)
+            {
+                V[x+y*Nx] = ww*0.25 * (U[x-1+(y-1)*Nx] + U[x+1+(y-1)*Nx] + U[x-1+(y+1)*Nx] + U[x+1+(y+1)*Nx]) + (1-ww)*U[x+y*Nx] +
+                             r*0.25 * (V[x-1+(y-1)*Nx] - U[x-1+(y-1)*Nx]) +
+                             s*0.25 * (V[x+1+(y-1)*Nx] - U[x+1+(y-1)*Nx]) +
+                             t*0.25 * (V[x-1+(y+1)*Nx] - U[x-1+(y+1)*Nx]) +
+                             u*0.25 * (V[x+1+(y+1)*Nx] - U[x+1+(y+1)*Nx]);
+            }
+    }
 	//
 	// The QUARTER-SWEEP iterative method.
 	//
@@ -447,7 +470,31 @@ public class Solver {
             }
     }
         	
-	public void doFillQS() {
+    public void doQSMQOR(double w, double ww, double r, double s, double t, double u) {
+        // Compute the RED nodes
+        for(int y = 2; y < Ny-2; y++)
+        for(int x = 2; x < Nx-2; x++)
+            if(RB[x+y*Nx] == 1)
+            if(W[x+y*Nx] != WALL_VALUE)
+            {
+                V[x+y*Nx] = ww*0.25 * (U[x-2+y*Nx] + U[x+2+y*Nx] + U[x+(y-2)*Nx] + U[x+(y+2)*Nx]) + (1-ww)*U[x+y*Nx];
+            }
+
+        // Compute the BLACK nodes
+        for(int y = 2; y < Ny-2; y++)
+        for(int x = 2; x < Nx-2; x++)
+            if(RB[x+y*Nx] == 2)
+            if(W[x+y*Nx] != WALL_VALUE)
+            {
+                V[x+y*Nx] =  w*0.25 * (U[x-2+y*Nx] + U[x+2+y*Nx] + U[x+(y-2)*Nx] + U[x+(y+2)*Nx]) + (1-w)*U[x+y*Nx] +
+                             r*0.25 * (V[x-2+y*Nx] - U[x-2+y*Nx]) +
+                             s*0.25 * (V[x+(y-2)*Nx] - U[x+(y-2)*Nx]) +
+                             t*0.25 * (V[x+2+y*Nx] - U[x+2+y*Nx]) +
+                             u*0.25 * (V[x+(y+2)*Nx] - U[x+(y+2)*Nx]);
+            }
+    }
+    
+    public void doFillQS() {
 		// Compute WHITE Square, i.e. x and y are ODD
 		for(int y = 1; y < Ny-1; y++)
 		for(int x = 1; x < Nx-1; x++)

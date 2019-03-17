@@ -418,6 +418,17 @@ public class Planner extends JFrame implements ActionListener {
                 solver.updateMatrix();
                 taNote.append(String.format(">>> HSMTOR, w1=%.2f, w2=%.2f, r=%.2f, s=%.2f\n", w, ww, r, s));
             } else            
+            if (tfMethod.getText().toUpperCase().equals("HSMQOR")) {
+                while(!converge) {
+                    solver.doHSMQOR(w, ww, r, s, t, u);
+                    label.setText(String.format("%d", ++iteration));
+                    converge = solver.checkConverge();
+                    solver.updateMatrix();
+                }
+                solver.doFillHS();
+                solver.updateMatrix();
+                taNote.append(String.format(">>> HSMQOR, w1=%.2f, w2=%.2f, r=%.2f, s=%.2f, t=%.2f, u=%.2f\n", w, ww, r, s, t, u));
+            } else            
             if (tfMethod.getText().toUpperCase().equals("QSSOR")) {
                 while(!converge) {
                     solver.doQSSOR(w);
@@ -485,9 +496,20 @@ public class Planner extends JFrame implements ActionListener {
                 }
                 solver.doFillQS();
                 solver.updateMatrix();
-                taNote.append(String.format(">>> QSMAOR, w=%.2f, r=%.2f, s=%.2f\n", w, ww, r, s));
-            } 
-
+                taNote.append(String.format(">>> QSMTOR, w=%.2f, r=%.2f, s=%.2f\n", w, ww, r, s));
+            } else
+            if (tfMethod.getText().toUpperCase().equals("QSMQOR")) {
+                solver.doInitRB();
+                while(!converge) {
+                    solver.doQSMQOR(w, ww, r, s, t, u);
+                    label.setText(String.format("%d", ++iteration));
+                    converge = solver.checkConverge();
+                    solver.updateMatrix();
+                }
+                solver.doFillQS();
+                solver.updateMatrix();
+                taNote.append(String.format(">>> QSMQOR, w=%.2f, r=%.2f, s=%.2f, t=%.2f, i=%.2f\n", w, ww, r, s, t, u));
+            }
             long stopTime = System.nanoTime();
             long elapsed = stopTime - startTime;
             elapsed = TimeUnit.NANOSECONDS.toMillis(elapsed); // Total elapsed in ms
