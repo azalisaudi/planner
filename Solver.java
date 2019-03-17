@@ -26,6 +26,8 @@ public class Solver {
     double[] U;
     double[] V;
     int[] W;
+    
+    int[] RB;    
 
     double[] Lo;
     double[] Up;
@@ -41,6 +43,8 @@ public class Solver {
 		U = new double[Nx*Ny];
 		V = new double[Nx*Ny];
 		W = new int[Nx*Ny];
+
+        RB= new int[Nx*Ny];
 
 		Lo = new double[Nx*Ny];
 		Up = new double[Nx*Ny];
@@ -236,11 +240,83 @@ public class Solver {
 							s*0.25 * (V[x+1+(y-1)*Nx] - U[x+1+(y-1)*Nx]);
 			}
 	}
-
+	
+    public void doFillHS() {
+        for(int y = 1; y < Ny-1; y++)
+        for(int x = 1; x < Nx-1; x++)
+            if(((x+y) % 2) == 1)
+            if(W[x+y*Nx] != WALL_VALUE)
+            {
+                V[x+y*Nx] = 0.25 * (V[x-1+y*Nx] + V[x+1+y*Nx] + V[x+(y-1)*Nx] + V[x+(y+1)*Nx]);
+            }
+    }
+    
 	//
 	// The HALF-SWEEP MODIFIED iterative method.
 	//
+    public void doHSMSOR(double w, double ww) {
+        // Compute the RED nodes
+        for(int y = 1; y < Ny-1; y++)
+        for(int x = 1; x < Nx-1; x++)
+            if((x%2 == 0) && (y%2 == 0))
+            if(W[x+y*Nx] != WALL_VALUE)
+            {
+                V[x+y*Nx] = w*0.25 * (U[x-1+(y-1)*Nx] + U[x+1+(y-1)*Nx] + U[x-1+(y+1)*Nx] + U[x+1+(y+1)*Nx]) + (1-w)*U[x+y*Nx];
+            }
 
+        // Compute the BLACK nodes
+        for(int y = 1; y < Ny-1; y++)
+        for(int x = 1; x < Nx-1; x++)
+            if((x%2 == 1) && (y%2 == 1))
+            if(W[x+y*Nx] != WALL_VALUE)
+            {
+                V[x+y*Nx] = ww*0.25 * (V[x-1+(y-1)*Nx] + V[x+1+(y-1)*Nx] + V[x-1+(y+1)*Nx] + V[x+1+(y+1)*Nx]) + (1-ww)*U[x+y*Nx];
+            }
+    }
+
+    public void doHSMAOR(double w, double ww, double r) {
+        // Compute the RED nodes
+        for(int y = 1; y < Ny-1; y++)
+        for(int x = 1; x < Nx-1; x++)
+            if((x%2 == 0) && (y%2 == 0))
+            if(W[x+y*Nx] != WALL_VALUE)
+            {
+                V[x+y*Nx] = w*0.25 * (U[x-1+(y-1)*Nx] + U[x+1+(y-1)*Nx] + U[x-1+(y+1)*Nx] + U[x+1+(y+1)*Nx]) + (1-w)*U[x+y*Nx];
+            }
+
+        // Compute the BLACK nodes
+        for(int y = 1; y < Ny-1; y++)
+        for(int x = 1; x < Nx-1; x++)
+            if((x%2 == 1) && (y%2 == 1))
+            if(W[x+y*Nx] != WALL_VALUE)
+            {
+                V[x+y*Nx] = ww*0.25 * (U[x-1+(y-1)*Nx] + U[x+1+(y-1)*Nx] + U[x-1+(y+1)*Nx] + U[x+1+(y+1)*Nx]) + (1-ww)*U[x+y*Nx] +
+                             r*0.25 * (V[x-1+(y-1)*Nx] - U[x-1+(y-1)*Nx] + V[x+1+(y-1)*Nx] - U[x+1+(y-1)*Nx] +
+                                       V[x-1+(y+1)*Nx] - U[x-1+(y+1)*Nx] + V[x+1+(y+1)*Nx] - U[x+1+(y+1)*Nx]);
+            }
+    }
+
+    public void doHSMTOR(double w, double ww, double r, double s) {
+        // Compute the RED nodes
+        for(int y = 1; y < Ny-1; y++)
+        for(int x = 1; x < Nx-1; x++)
+            if((x%2 == 0) && (y%2 == 0))
+            if(W[x+y*Nx] != WALL_VALUE)
+            {
+                V[x+y*Nx] = w*0.25 * (U[x-1+(y-1)*Nx] + U[x+1+(y-1)*Nx] + U[x-1+(y+1)*Nx] + U[x+1+(y+1)*Nx]) + (1-w)*U[x+y*Nx];
+            }
+
+        // Compute the BLACK nodes
+        for(int y = 1; y < Ny-1; y++)
+        for(int x = 1; x < Nx-1; x++)
+            if((x%2 == 1) && (y%2 == 1))
+            if(W[x+y*Nx] != WALL_VALUE)
+            {
+                V[x+y*Nx] = ww*0.25 * (U[x-1+(y-1)*Nx] + U[x+1+(y-1)*Nx] + U[x-1+(y+1)*Nx] + U[x+1+(y+1)*Nx]) + (1-ww)*U[x+y*Nx] +
+                             r*0.25 * (V[x-1+(y-1)*Nx] - U[x-1+(y-1)*Nx] + V[x+1+(y-1)*Nx] - U[x+1+(y-1)*Nx]) +
+                             s*0.25 * (V[x-1+(y+1)*Nx] - U[x-1+(y+1)*Nx] + V[x+1+(y+1)*Nx] - U[x+1+(y+1)*Nx]);
+            }
+    }
 
 
 	//
@@ -279,6 +355,98 @@ public class Solver {
 			}
 	}
 
+	//
+	// The QUARTER-SWEEP MODIFIED iterative method.
+	//
+    public void doInitRB()
+    {
+        // Let all be WHITE nodes
+        for(int y = 0; y < Ny; y++)
+        for(int x = 0; x < Nx; x++)
+            RB[x+y*Nx] = 0;
+
+        for(int y = 2; y < Ny-2; y+=4)
+        for(int x = 2; x < Nx-2; x+=4) {
+            RB[x+y*Nx] = 1;
+            RB[x+2+(y+2)*Nx] = 1;
+
+            RB[x+2+y*Nx] = 2;
+            RB[x+(y+2)*Nx] = 2;
+        }
+/*
+        for(int y = 0; y < Ny; y++) {
+            for(int x = 0; x < Nx; x++)
+                System.out.print(String.format("%d", RB[x+y*Nx]));
+            System.out.println();
+        }
+*/
+    }
+
+    public void doQSMSOR(double w, double ww) {
+        // Compute the RED nodes
+        for(int y = 2; y < Ny-2; y++)
+        for(int x = 2; x < Nx-2; x++)
+            if(RB[x+y*Nx] == 1)
+            if(W[x+y*Nx] != WALL_VALUE)
+            {
+                V[x+y*Nx] = w*0.25 * (U[x-2+y*Nx] + U[x+2+y*Nx] + U[x+(y-2)*Nx] + U[x+(y+2)*Nx]) + (1-w)*U[x+y*Nx];
+            }
+
+        // Compute the BLACK nodes
+        for(int y = 2; y < Ny-2; y++)
+        for(int x = 2; x < Nx-2; x++)
+            if(RB[x+y*Nx] == 2)
+            if(W[x+y*Nx] != WALL_VALUE)
+            {
+                V[x+y*Nx] = ww*0.25 * (V[x-2+y*Nx] + V[x+2+y*Nx] + V[x+(y-2)*Nx] + V[x+(y+2)*Nx]) + (1-ww)*U[x+y*Nx];
+            }
+    }
+
+
+    public void doQSMAOR(double w, double ww, double r) {
+        // Compute the RED nodes
+        for(int y = 2; y < Ny-2; y++)
+        for(int x = 2; x < Nx-2; x++)
+            if(RB[x+y*Nx] == 1)
+            if(W[x+y*Nx] != WALL_VALUE)
+            {
+                V[x+y*Nx] = ww*0.25 * (U[x-2+y*Nx] + U[x+2+y*Nx] + U[x+(y-2)*Nx] + U[x+(y+2)*Nx]) + (1-ww)*U[x+y*Nx];
+            }
+
+        // Compute the BLACK nodes
+        for(int y = 2; y < Ny-2; y++)
+        for(int x = 2; x < Nx-2; x++)
+            if(RB[x+y*Nx] == 2)
+            if(W[x+y*Nx] != WALL_VALUE)
+            {
+                V[x+y*Nx] =  w*0.25 * (U[x-2+y*Nx] + U[x+2+y*Nx] + U[x+(y-2)*Nx] + U[x+(y+2)*Nx]) + (1-w)*U[x+y*Nx] +
+                             r*0.25 * (V[x-2+y*Nx] - U[x-2+y*Nx] + V[x+(y-2)*Nx] - U[x+(y-2)*Nx] +
+                                       V[x+2+y*Nx] - U[x+2+y*Nx] + V[x+(y+2)*Nx] - U[x+(y+2)*Nx]);
+            }
+    }
+    
+    public void doQSMTOR(double w, double ww, double r, double s) {
+        // Compute the RED nodes
+        for(int y = 2; y < Ny-2; y++)
+        for(int x = 2; x < Nx-2; x++)
+            if(RB[x+y*Nx] == 1)
+            if(W[x+y*Nx] != WALL_VALUE)
+            {
+                V[x+y*Nx] = ww*0.25 * (U[x-2+y*Nx] + U[x+2+y*Nx] + U[x+(y-2)*Nx] + U[x+(y+2)*Nx]) + (1-ww)*U[x+y*Nx];
+            }
+
+        // Compute the BLACK nodes
+        for(int y = 2; y < Ny-2; y++)
+        for(int x = 2; x < Nx-2; x++)
+            if(RB[x+y*Nx] == 2)
+            if(W[x+y*Nx] != WALL_VALUE)
+            {
+                V[x+y*Nx] =  w*0.25 * (U[x-2+y*Nx] + U[x+2+y*Nx] + U[x+(y-2)*Nx] + U[x+(y+2)*Nx]) + (1-w)*U[x+y*Nx] +
+                             r*0.25 * (V[x-2+y*Nx] - U[x-2+y*Nx] + V[x+(y-2)*Nx] - U[x+(y-2)*Nx]) +
+                             s*0.25 * (V[x+2+y*Nx] - U[x+2+y*Nx] + V[x+(y+2)*Nx] - U[x+(y+2)*Nx]);
+            }
+    }
+        	
 	public void doFillQS() {
 		// Compute WHITE Square, i.e. x and y are ODD
 		for(int y = 1; y < Ny-1; y++)
