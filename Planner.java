@@ -1,7 +1,7 @@
 //
 // Author: Azali Saudi
 // Date Created : 30 Dec 2016
-// Last Modified: 13 Feb 2019
+// Last Modified: 02 Aug 2021
 // Task: The GUI for Robot Path Planning
 //
 
@@ -41,11 +41,6 @@ public class Planner extends JFrame implements ActionListener {
     public static JTextField tfGoalX;
     public static JTextField tfGoalY;
     public static JTextField tfW1;
-    public static JTextField tfW2;
-    public static JTextField tfR1;
-    public static JTextField tfR2;
-    public static JTextField tfR3;
-    public static JTextField tfR4;
     public static JScrollPane spNote;
     public static JTextArea taNote;
     public static Map canvas;
@@ -110,22 +105,6 @@ public class Planner extends JFrame implements ActionListener {
         tfW1 = new JTextField("1.80");
         tfW1.setBounds(10,Height+60, 50,25);
         content.add(tfW1);
-        tfW2 = new JTextField("1.82");
-        tfW2.setBounds(10,Height+85, 50,25);
-        content.add(tfW2);
-
-        tfR1 = new JTextField("1.84");
-        tfR1.setBounds(80,Height+60, 50,25);
-        content.add(tfR1);
-        tfR2 = new JTextField("1.86");
-        tfR2.setBounds(80,Height+85, 50,25);
-        content.add(tfR2);
-        tfR3 = new JTextField("1.88");
-        tfR3.setBounds(80,Height+110,50,25);
-        content.add(tfR3);
-        tfR4 = new JTextField("1.90");
-        tfR4.setBounds(80,Height+135,50,25);
-        content.add(tfR4);
 
         taNote = new JTextArea("");
         JScrollPane spNote = new JScrollPane(taNote);
@@ -279,11 +258,6 @@ public class Planner extends JFrame implements ActionListener {
             int gx = Integer.parseInt(tfGoalX.getText());
             int gy = Integer.parseInt(tfGoalY.getText());
             double w = Float.parseFloat(tfW1.getText());
-            double ww= Float.parseFloat(tfW2.getText());
-            double r = Float.parseFloat(tfR1.getText());
-            double s = Float.parseFloat(tfR2.getText());
-            double t = Float.parseFloat(tfR3.getText());
-            double u = Float.parseFloat(tfR4.getText());
             int iteration = 0;
             boolean converge = false;
             long startTime = System.nanoTime();
@@ -297,219 +271,8 @@ public class Planner extends JFrame implements ActionListener {
                     solver.updateMatrix();
                 }
                 taNote.append(String.format(">>> SOR, w=%.2f\n", w));
-            } else
-            if (tfMethod.getText().toUpperCase().equals("AOR")) {
-                while(!converge) {
-                    solver.doAOR(w, r);
-                    label.setText(String.format("%d", ++iteration));
-                    converge = solver.checkConverge();
-                    solver.updateMatrix();
-                }
-                taNote.append(String.format(">>> AOR, w=%.2f, r=%.2f\n", w, r));
-            } else
-            if (tfMethod.getText().toUpperCase().equals("TOR")) {
-                while(!converge) {
-                    solver.doTOR(w, r, s);
-                    label.setText(String.format("%d", ++iteration));
-                    converge = solver.checkConverge();
-                    solver.updateMatrix();
-                }
-                taNote.append(String.format(">>> TOR, w=%.2f, r=%.2f, s=%.2f\n", w, r, s));
-            } else
-            if (tfMethod.getText().toUpperCase().equals("MSOR")) {
-                while(!converge) {
-                    solver.doMSOR(w, ww);
-                    label.setText(String.format("%d", ++iteration));
-                    converge = solver.checkConverge();
-                    solver.updateMatrix();
-                }
-                taNote.append(String.format(">>> MSOR, w1=%.2f, w2=%.2f\n", w, ww));
-            } else
-            if (tfMethod.getText().toUpperCase().equals("MAOR")) {
-                while(!converge) {
-                    solver.doMAOR(w, ww, r);
-                    label.setText(String.format("%d", ++iteration));
-                    converge = solver.checkConverge();
-                    solver.updateMatrix();
-                }
-                taNote.append(String.format(">>> MAOR, w1=%.2f, w2=%.2f, r=%.2f\n", w, ww, r));
-            } else
-            if (tfMethod.getText().toUpperCase().equals("MTOR")) {
-                while(!converge) {
-                    solver.doMTOR(w, ww, r, s);
-                    label.setText(String.format("%d", ++iteration));
-                    converge = solver.checkConverge();
-                    solver.updateMatrix();
-                }
-                taNote.append(String.format(">>> MTOR, w1=%.2f, w2=%.2f, r=%.2f, s=%.2f\n", w, ww, r,s));
-            } else
-            if (tfMethod.getText().toUpperCase().equals("MQOR")) {
-                while(!converge) {
-                    solver.doMTOR(w, ww, r, s);
-                    label.setText(String.format("%d", ++iteration));
-                    converge = solver.checkConverge();
-                    solver.updateMatrix();
-                }
-                taNote.append(String.format(">>> MQOR, w1=%.2f, w2=%.2f, r=%.2f, s=%.2f\n", w, ww, r,s,t,u));
-            } else
-            if (tfMethod.getText().toUpperCase().equals("HSSOR")) {
-                while(!converge) {
-                    solver.doHSSOR(w);
-                    label.setText(String.format("%d", ++iteration));
-                    converge = solver.checkConverge();
-                    solver.updateMatrix();
-                }
-                solver.doRedJOR(1.0);
-                solver.updateMatrix();
-                taNote.append(String.format(">>> HSSOR, w=%.2f\n", w));
-            } else
-            if (tfMethod.getText().toUpperCase().equals("HSAOR")) {
-                while(!converge) {
-                    solver.doHSAOR(w, r);
-                    label.setText(String.format("%d", ++iteration));
-                    converge = solver.checkConverge();
-                    solver.updateMatrix();
-                }
-                solver.doRedJOR(1.0);
-                solver.updateMatrix();
-                taNote.append(String.format(">>> HSAOR, w=%.2f, r=%.2f\n", w, r, s));
-            } else
-            if (tfMethod.getText().toUpperCase().equals("HSTOR")) {
-                while(!converge) {
-                    solver.doHSTOR(w, r, s);
-                    label.setText(String.format("%d", ++iteration));
-                    converge = solver.checkConverge();
-                    solver.updateMatrix();
-                }
-                solver.doRedJOR(1.0);
-                solver.updateMatrix();
-                taNote.append(String.format(">>> HSTOR, w=%.2f, r=%.2f, s=%.2f\n", w, r, s));
-            } else
-            if (tfMethod.getText().toUpperCase().equals("HSMSOR")) {
-                while(!converge) {
-                    solver.doHSMSOR(w, ww);
-                    label.setText(String.format("%d", ++iteration));
-                    converge = solver.checkConverge();
-                    solver.updateMatrix();
-                }
-                solver.doFillHS();
-                solver.updateMatrix();
-                taNote.append(String.format(">>> HSMSOR, w1=%.2f, w2=%.2f\n", w, ww));
-            } else            
-            if (tfMethod.getText().toUpperCase().equals("HSMAOR")) {
-                while(!converge) {
-                    solver.doHSMAOR(w, ww, r);
-                    label.setText(String.format("%d", ++iteration));
-                    converge = solver.checkConverge();
-                    solver.updateMatrix();
-                }
-                solver.doFillHS();
-                solver.updateMatrix();
-                taNote.append(String.format(">>> HSMAOR, w1=%.2f, w2=%.2f, r=%.2f\n", w, ww, r));
-            } else            
-            if (tfMethod.getText().toUpperCase().equals("HSMTOR")) {
-                while(!converge) {
-                    solver.doHSMTOR(w, ww, r, s);
-                    label.setText(String.format("%d", ++iteration));
-                    converge = solver.checkConverge();
-                    solver.updateMatrix();
-                }
-                solver.doFillHS();
-                solver.updateMatrix();
-                taNote.append(String.format(">>> HSMTOR, w1=%.2f, w2=%.2f, r=%.2f, s=%.2f\n", w, ww, r, s));
-            } else            
-            if (tfMethod.getText().toUpperCase().equals("HSMQOR")) {
-                while(!converge) {
-                    solver.doHSMQOR(w, ww, r, s, t, u);
-                    label.setText(String.format("%d", ++iteration));
-                    converge = solver.checkConverge();
-                    solver.updateMatrix();
-                }
-                solver.doFillHS();
-                solver.updateMatrix();
-                taNote.append(String.format(">>> HSMQOR, w1=%.2f, w2=%.2f, r=%.2f, s=%.2f, t=%.2f, u=%.2f\n", w, ww, r, s, t, u));
-            } else            
-            if (tfMethod.getText().toUpperCase().equals("QSSOR")) {
-                while(!converge) {
-                    solver.doQSSOR(w);
-                    label.setText(String.format("%d", ++iteration));
-                    converge = solver.checkConverge();
-                    solver.updateMatrix();
-                }
-                solver.doFillQS();
-                solver.updateMatrix();
-                taNote.append(String.format(">>> QSSOR, w=%.2f\n", w));
-            } else
-            if (tfMethod.getText().toUpperCase().equals("QSAOR")) {
-                while(!converge) {
-                    solver.doQSAOR(w, r);
-                    label.setText(String.format("%d", ++iteration));
-                    converge = solver.checkConverge();
-                    solver.updateMatrix();
-                }
-                solver.doFillQS();
-                solver.updateMatrix();
-                taNote.append(String.format(">>> QSAOR, w=%.2f, r=%.2f\n", w, r));
-            } else
-            if (tfMethod.getText().toUpperCase().equals("QSTOR")) {
-                while(!converge) {
-                    solver.doQSTOR(w, r, s);
-                    label.setText(String.format("%d", ++iteration));
-                    converge = solver.checkConverge();
-                    solver.updateMatrix();
-                }
-                solver.doFillQS();
-                solver.updateMatrix();
-                taNote.append(String.format(">>> QSAOR, w=%.2f, r=%.2f, s=%.2f\n", w, r, s));
-            } else
-            if (tfMethod.getText().toUpperCase().equals("QSMSOR")) {
-                solver.doInitRB();
-                while(!converge) {
-                    solver.doQSMSOR(w, ww);
-                    label.setText(String.format("%d", ++iteration));
-                    converge = solver.checkConverge();
-                    solver.updateMatrix();
-                }
-                solver.doFillQS();
-                solver.updateMatrix();
-                taNote.append(String.format(">>> QSMSOR, w=%.2f, r=%.2f\n", w, ww));
-            } else
-            if (tfMethod.getText().toUpperCase().equals("QSMAOR")) {
-                solver.doInitRB();
-                while(!converge) {
-                    solver.doQSMAOR(w, ww, r);
-                    label.setText(String.format("%d", ++iteration));
-                    converge = solver.checkConverge();
-                    solver.updateMatrix();
-                }
-                solver.doFillQS();
-                solver.updateMatrix();
-                taNote.append(String.format(">>> QSMAOR, w=%.2f, r=%.2f\n", w, ww, r));
-            } else
-            if (tfMethod.getText().toUpperCase().equals("QSMTOR")) {
-                solver.doInitRB();
-                while(!converge) {
-                    solver.doQSMTOR(w, ww, r, s);
-                    label.setText(String.format("%d", ++iteration));
-                    converge = solver.checkConverge();
-                    solver.updateMatrix();
-                }
-                solver.doFillQS();
-                solver.updateMatrix();
-                taNote.append(String.format(">>> QSMTOR, w=%.2f, r=%.2f, s=%.2f\n", w, ww, r, s));
-            } else
-            if (tfMethod.getText().toUpperCase().equals("QSMQOR")) {
-                solver.doInitRB();
-                while(!converge) {
-                    solver.doQSMQOR(w, ww, r, s, t, u);
-                    label.setText(String.format("%d", ++iteration));
-                    converge = solver.checkConverge();
-                    solver.updateMatrix();
-                }
-                solver.doFillQS();
-                solver.updateMatrix();
-                taNote.append(String.format(">>> QSMQOR, w=%.2f, r=%.2f, s=%.2f, t=%.2f, i=%.2f\n", w, ww, r, s, t, u));
             }
+
             long stopTime = System.nanoTime();
             long elapsed = stopTime - startTime;
             elapsed = TimeUnit.NANOSECONDS.toMillis(elapsed); // Total elapsed in ms
