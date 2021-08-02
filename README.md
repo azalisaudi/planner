@@ -25,5 +25,5 @@ References:
 
 My other works can be accessed at:
 1. WoS ResearchID: https://publons.com/researcher/Q-1006-2018/
-2. Personal site: https://sites.google.com/ums.edu.my/azali/home
+2. Personal site: https://sites.google.com/ums.edu.my/azali/
 3. ResearchGate: https://www.researchgate.net/profile/Azali-Saudi
