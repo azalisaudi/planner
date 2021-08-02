@@ -1,6 +1,10 @@
 # Planner: Robot Path Planning
 
-Path Planning simulator. The map is in PNG format. It is implemented in Java. 
+Path Planning simulator. It is implemented in Java. 
+
+The map is in PNG format. 
+
+![image](https://user-images.githubusercontent.com/43895669/127853960-7dc21774-f35a-4c59-8b7a-8f9918f3ec07.png)
 
 Use mouse left and right click to specify the start and goal points.
 
