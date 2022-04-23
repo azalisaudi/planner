@@ -2,6 +2,7 @@
 // Author: Azali Saudi
 // Date Created : 30 Dec 2016
 // Last Modified: 02 Aug 2021
+// Latest Update: 24 Apr 2022
 // Task: The Solver implementation of SOR.
 //
 
@@ -27,11 +28,6 @@ public class Solver {
     double[] V;
     int[] W;
     
-    int[] RB;    
-
-    double[] Lo;
-    double[] Up;
-
     int Nx,Ny;
 
     public Queue<Point> path;
@@ -43,11 +39,6 @@ public class Solver {
 		U = new double[Nx*Ny];
 		V = new double[Nx*Ny];
 		W = new int[Nx*Ny];
-
-        RB= new int[Nx*Ny];
-
-		Lo = new double[Nx*Ny];
-		Up = new double[Nx*Ny];
 
 		path = new LinkedList<Point>();
 
@@ -63,22 +54,17 @@ public class Solver {
 			if(rgb == 0) {
 				U[x+y*Nx] = V[x+y*Nx] = BOUNDARY_VALUE;
 				W[x+y*Nx] = WALL_VALUE;
-
-				Lo[x+y*Nx] = Up[x+y*Nx] = BOUNDARY_VALUE;
 			}
 
 			// The goal point
 			else if((x == gx) && (y == gy)) {
 				U[x+y*Nx] = V[x+y*Nx] = GOAL_VALUE;
 				W[x+y*Nx] = WALL_VALUE;
-
-				Lo[x+y*Nx] = Up[x+y*Nx] = GOAL_VALUE;
 			}
 
 			// The free space
 			else { //if(rgb == 0xFFFFFF) {
 				U[x+y*Nx] = V[x+y*Nx] = FREE_VALUE;
-				Lo[x+y*Nx] = Up[x+y*Nx] = FREE_VALUE;
 			}
 		}
 
