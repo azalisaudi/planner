@@ -16,21 +16,21 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 public class Solver {
-    static final int WALL_VALUE = 1;
-    static final int GOAL_VALUE = 0;
-    static final double FREE_VALUE = 1.19;
-    static final double BOUNDARY_VALUE = 1.20;
+	static final int WALL_VALUE = 1;
+	static final int GOAL_VALUE = 0;
+	static final double FREE_VALUE = 1.19;
+	static final double BOUNDARY_VALUE = 1.20;
 
-    static final double EPSILON = 1.0e-14;
+	static final double EPSILON = 1.0e-14;
 
-    //Matrix variables
-    double[] U;
-    double[] V;
-    int[] W;
-    
-    int Nx,Ny;
+	//Matrix variables
+	double[] U;
+	double[] V;
+	int[] W;
 
-    public Queue<Point> path;
+	int Nx,Ny;
+
+	public Queue<Point> path;
 
 	public Solver(BufferedImage img, int gx, int gy) {
 		Nx = img.getWidth();
