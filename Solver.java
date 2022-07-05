@@ -75,8 +75,6 @@ public class Solver {
 			int y = gy + dP[k][1];
 			U[x+y*Nx] = V[x+y*Nx] = GOAL_VALUE;
 			W[x+y*Nx] = WALL_VALUE;
-			
-			Lo[x+y*Nx] = Up[x+y*Nx] = GOAL_VALUE;
 		}
 	}
 
